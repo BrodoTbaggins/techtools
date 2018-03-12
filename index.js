@@ -1,6 +1,9 @@
 const Excel = require('exceljs');
+const fs = require('fs');
 const os = require('os');
 const si = require('systeminformation');
+
+const xlsxLocation = '\\\\ut-s-mgmt01\\iso\\Tech Tools\\Inventory Info\\Template.xlsx';
 
 //Gather all usable information
 const data = {
@@ -31,9 +34,13 @@ si.system().then(res => {
 });
 
 function writeFile(){
+  //Check if file needs to be created
+  if(!fs.existsSync(xlsxLocation)){
+    return createFile();
+  }
+
   //Open workbook
   const workbook = new Excel.Workbook();
-  const file = '\\\\ut-s-mgmt01\\iso\\Tech Tools\\Inventory Info\\Template.xlsx';
 
   //Compile data to push
   const dataToPush = [];
@@ -48,15 +55,60 @@ function writeFile(){
   dataToPush[28] = data.hostname;
 
   //Push values to workbook
-  workbook.xlsx.readFile(file)
+  workbook.xlsx.readFile(xlsxLocation)
   .then(() => {
     workbook.getWorksheet('Data').addRow(dataToPush);
-    return workbook.xlsx.writeFile(file);
+    return workbook.xlsx.writeFile(xlsxLocation);
   })
   .then(() => {
     console.log('done');
   })
   .catch(err => {
     console.error(err);
+  });
+}
+
+function createFile(){
+  const workbook = new Excel.Workbook();
+  const sheet = workbook.addWorksheet('Data');
+
+  //Required columns required for proper import
+  const rows = [
+    'Asset_ID',
+    'Description',
+    'Region',
+    'Building_x002F_Floor',
+    'Room',
+    'Serial_No.',
+    'Model_Name',
+    'Manufacturer',
+    'Department',
+    'First_Name',
+    'Last_Name',
+    'Status',
+    'Asset_Type',
+    'Notes',
+    'Vendor',
+    'Purchase_Order',
+    'Acquisition_Date',
+    'Cost',
+    'Account',
+    'Warranty_No.',
+    'Warranty_Start_Date',
+    'Warranty_End_Date',
+    'Lease_Start_Date',
+    'Lease_End_Date',
+    'Lease_No.',
+    'Inactive',
+    'Wireless_MAC',
+    'Wired_Mac_Address',
+    'Host_Name',
+    'Operating_System',
+    'Seat',
+    'Maintenance_Notes'
+  ];
+  sheet.addRow(rows);
+  workbook.xlsx.writeFile(xlsxLocation).then(() => {
+    writeFile();
   });
 }
