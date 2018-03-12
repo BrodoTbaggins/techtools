@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/treemmett/techtools#readme",
   "dependencies": {
+    "exceljs": "^0.9.1",
     "systeminformation": "^3.37.5"
   }
 }
