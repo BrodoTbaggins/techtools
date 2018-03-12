@@ -14,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/treemmett/techtools/issues"
   },
-  "homepage": "https://github.com/treemmett/techtools#readme"
+  "homepage": "https://github.com/treemmett/techtools#readme",
+  "dependencies": {
+    "systeminformation": "^3.37.5"
+  }
 }

@@ -1,4 +1,5 @@
 const os = require('os');
+const si = require('systeminformation');
 
 //Gather all usable information
 const data = {
@@ -19,4 +20,11 @@ for(let i in nic){
   data.network[i] = nic[i][0].mac;
 }
 
-console.log(data);
+//Get system information
+si.system().then(res => {
+  data.manufacturer = res.manufacturer;
+  data.model = res.model;
+  data.serialNumber = res.serial;
+
+  console.log(data);
+});
