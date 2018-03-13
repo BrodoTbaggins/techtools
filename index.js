@@ -32,22 +32,27 @@ si.system().then(res => {
   data.model = res.model;
   data.serialNumber = res.serial;
 
-  //Query AD to get username
-  const ad = new ActiveDirectory(config.ad);
-  ad.findUser(data.username, function(err, user) {
-    if (err) {
-      console.log('ERROR');
-      console.log();
-      console.log(JSON.stringify(err));
-      return;
-    }
+  //Get OS
+  si.osInfo().then(res => {
+    data.os = res.distro;
 
-    if(user){
-      data.firstName = user.givenName;
-      data.lastName = user.sn;
-    }
+    //Query AD to get username
+    const ad = new ActiveDirectory(config.ad);
+    ad.findUser(data.username, function(err, user) {
+      if (err) {
+        console.log('ERROR');
+        console.log();
+        console.log(JSON.stringify(err));
+        return;
+      }
 
-    writeFile();
+      if(user){
+        data.firstName = user.givenName;
+        data.lastName = user.sn;
+      }
+
+      writeFile();
+    });
   });
 });
 
@@ -72,6 +77,7 @@ function writeFile(){
   dataToPush[26] = data.network['Wi-Fi'];
   dataToPush[27] = data.network['Ethernet'];
   dataToPush[28] = data.hostname;
+  dataToPush[29] = data.os;
 
   //Push values to workbook
   workbook.xlsx.readFile(xlsxLocation)
