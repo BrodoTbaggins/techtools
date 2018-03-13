@@ -1,9 +1,11 @@
 const Excel = require('exceljs');
+const ActiveDirectory = require('activedirectory');
 const fs = require('fs');
 const os = require('os');
 const si = require('systeminformation');
+const config = require('./config');
 
-const xlsxLocation = '\\\\ut-s-mgmt01\\iso\\Tech Tools\\Inventory Info\\Template.xlsx';
+const xlsxLocation = config.xlsxLocation;
 
 //Gather all usable information
 const data = {
@@ -30,7 +32,23 @@ si.system().then(res => {
   data.model = res.model;
   data.serialNumber = res.serial;
 
-  writeFile();
+  //Query AD to get username
+  const ad = new ActiveDirectory(config.ad);
+  ad.findUser(data.username, function(err, user) {
+    if (err) {
+      console.log('ERROR');
+      console.log();
+      console.log(JSON.stringify(err));
+      return;
+    }
+
+    if(user){
+      data.firstName = user.givenName;
+      data.lastName = user.sn;
+    }
+
+    writeFile();
+  });
 });
 
 function writeFile(){
@@ -48,7 +66,8 @@ function writeFile(){
   dataToPush[5] = data.serialNumber;
   dataToPush[6] = data.model;
   dataToPush[7] = data.manufacturer;
-  dataToPush[9] = data.username;
+  dataToPush[9] = data.firstName;
+  dataToPush[10] = data.lastName;
   dataToPush[11] = 'Deployed';
   dataToPush[26] = data.network['Wi-Fi'];
   dataToPush[27] = data.network['Ethernet'];

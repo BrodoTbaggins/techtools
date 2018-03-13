@@ -4,3 +4,6 @@ jspm_packages/
 
 # Compiled builds
 build/
+
+# Server configuration settings
+config.js
