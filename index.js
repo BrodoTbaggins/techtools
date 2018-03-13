@@ -56,6 +56,7 @@ si.system().then(res => {
   });
 });
 
+let failedAttempts = 0;
 function writeFile(){
   //Check if file needs to be created
   if(!fs.existsSync(xlsxLocation)){
@@ -89,7 +90,15 @@ function writeFile(){
     console.log('done');
   })
   .catch(err => {
-    console.error(err);
+    //If file write failed, wait 3 seconds then try again
+    failedAttempts++;
+    if(failedAttempts < 3){
+      setTimeout(writeFile, 3000);
+    }else{
+      //Excel file is locked and cannot be edited, create JSON instead
+      console.log(err);
+      writeJSONFile();
+    }
   });
 }
 
@@ -135,5 +144,16 @@ function createFile(){
   sheet.addRow(rows);
   workbook.xlsx.writeFile(xlsxLocation).then(() => {
     writeFile();
+  });
+}
+
+function writeJSONFile(){
+  fs.writeFile(config.jsonLocation+data.asset+'.json', JSON.stringify(data), err => {
+    if(err){
+      console.log(err);
+      return;
+    }
+
+    console.log('JSON created');
   });
 }
