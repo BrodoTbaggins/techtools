@@ -75,8 +75,8 @@ function writeFile(){
   dataToPush[9] = data.firstName;
   dataToPush[10] = data.lastName;
   dataToPush[11] = 'Deployed';
-  dataToPush[26] = data.network['Wi-Fi'];
-  dataToPush[27] = data.network['Ethernet'];
+  dataToPush[26] = data.network['Wi-Fi'] || data.network['Wireless Network Connection'];
+  dataToPush[27] = data.network['Ethernet'] || data.network['Local Area Connection'];
   dataToPush[28] = data.hostname;
   dataToPush[29] = data.os;
 
