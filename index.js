@@ -1,9 +1,13 @@
-const Excel = require('exceljs');
 const ActiveDirectory = require('activedirectory');
+const exec = require('child_process').exec;
+const Excel = require('exceljs');
 const fs = require('fs');
 const os = require('os');
 const si = require('systeminformation');
 const config = require('./config');
+
+const wifiInterfaces = ['Wi-Fi', 'Wireless Network Connection'];
+const ethInterfaces = ['Ethernet', 'Local Area Connection'];
 
 const xlsxLocation = config.xlsxLocation;
 
@@ -15,16 +19,45 @@ const data = {
   network: {}
 }
 
-//Gather MAC's
-const nic = os.networkInterfaces();
-for(let i in nic){
-  //Don't include VirtualBox or Loopbacks
-  if(i.match(/virtualbox/gi) || i.match(/loopback/gi)){
-    continue;
+//Get mac address for windows
+exec('getmac /fo csv /v', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+  if(err){
+    throw err;
   }
 
-  data.network[i] = nic[i][0].mac;
-}
+  if(stderr){
+    console.log('ERROR', stderr);
+  }
+
+  //Parse CSV into array
+  const allMacs = stdout.split('\n');
+
+  //Remove CSV header
+  allMacs.shift();
+
+  //Parse all macs
+  for(let i = 0; i < allMacs.length; i++){
+    const currentMac = allMacs[i].split(',');
+
+    //Continue if array is empty
+    if(!currentMac[0].trim() || !currentMac[2].trim()){
+      continue;
+    }
+
+    //Clean up interface name and mac
+    const nicName = currentMac[0].replace(/['"]+/g, '');
+    const mac = currentMac[2].replace(/['"]+/g, '');
+
+    //Check if we're looking for this interface
+    if(wifiInterfaces.indexOf(nicName) >= 0){
+      data.network['Wi-Fi'] = mac;
+      continue;
+    }else if(ethInterfaces.indexOf(nicName) >= 0){
+      data.network['Ethernet'] = mac;
+      continue;
+    }
+  }
+});
 
 //Get system information
 si.system().then(res => {
@@ -75,8 +108,8 @@ function writeFile(){
   dataToPush[9] = data.firstName;
   dataToPush[10] = data.lastName;
   dataToPush[11] = 'Deployed';
-  dataToPush[26] = data.network['Wi-Fi'] || data.network['Wireless Network Connection'];
-  dataToPush[27] = data.network['Ethernet'] || data.network['Local Area Connection'];
+  dataToPush[26] = data.network['Wi-Fi'];
+  dataToPush[27] = data.network['Ethernet'];
   dataToPush[28] = data.hostname;
   dataToPush[29] = data.os;
 
