@@ -1,13 +1,19 @@
 const Excel = require('exceljs');
 const fs = require('fs');
+const jsonLocation = require('./config').jsonLocation;
 const xlsxLocation = require('./config').xlsxLocation;
 
 let failedAttempts = 0;
 
-module.exports = function(data){
+function writeFile(data){
+  if(process.platform === 'darwin'){
+    console.log(data);
+    process.exit();
+  }
+
   //Check if file needs to be created
   if(!fs.existsSync(xlsxLocation)){
-    return createFile();
+    return createFile(data);
   }
 
   //Open workbook
@@ -41,10 +47,10 @@ module.exports = function(data){
     //If file write failed, wait 3 seconds then try again
     failedAttempts++;
     if(failedAttempts < 3){
-      setTimeout(writeFile, 3000);
+      setTimeout(_ => writeFile(data), 3000);
     }else{
       //Excel file is locked and cannot be edited, create JSON instead
-      fs.writeFile(config.jsonLocation+data.asset+'.json', JSON.stringify(data), err => {
+      fs.writeFile(jsonLocation+data.asset+'.json', JSON.stringify(data), err => {
         if(err){
           console.log(err);
           return;
@@ -57,7 +63,7 @@ module.exports = function(data){
   });
 }
 
-function createFile(){
+function createFile(data){
   const workbook = new Excel.Workbook();
   const sheet = workbook.addWorksheet('Data');
 
@@ -98,6 +104,8 @@ function createFile(){
   ];
   sheet.addRow(rows);
   workbook.xlsx.writeFile(xlsxLocation).then(() => {
-    writeFile();
+    writeFile(data);
   });
 }
+
+module.exports = writeFile;

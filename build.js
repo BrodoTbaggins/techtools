@@ -1,3 +1,3 @@
 const {exec} = require('pkg');
 
-exec(['index.js', '--target', 'latest-win-x86', '--output', 'build/app.exe']);
+exec(['index.js', '--targets', 'node8-win-x86,node8-macos-x64', '--output', 'build/tech_tools']);
