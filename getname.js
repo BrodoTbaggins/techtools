@@ -14,9 +14,21 @@ module.exports = function(username){
         }
 
         //Remove other characters from out
-        const nameString = stdout.split(/\s{2,}/g)[1];
+        const name = stdout.split(/\s{2,}/g)[1];
 
         resolve(parseName(name));
+      });
+    }else if(process.platform === 'darwin'){
+      exec('dscl . -read "/Users/$(who am i | awk \'{print $1}\')" RealName | sed -n \'s/^ \/\/g;2p\'', (err, stdout, stderr) => {
+        if(err){
+          reject(err);
+        }
+
+        if(stderr){
+          reject(stderr);
+        }
+
+        resolve(parseName(stdout));
       });
     }else{
       resolve(parseName());
