@@ -1,4 +1,5 @@
 const exec = require('child_process').exec;
+const os = require('os');
 
 const wifiInterfaces = ['Wi-Fi', 'Wireless Network Connection'];
 const ethInterfaces = ['Ethernet', 'Local Area Connection'];
@@ -48,6 +49,8 @@ module.exports = function(){
 
         resolve(macs);
       });
+    }else if(process.platform === 'darwin'){
+      resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
     }else{
       resolve();
     }
