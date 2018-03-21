@@ -18,7 +18,6 @@
   "homepage": "https://github.com/treemmett/techtools#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "exceljs": "^0.9.1",
     "systeminformation": "^3.37.5"
   },
   "devDependencies": {
