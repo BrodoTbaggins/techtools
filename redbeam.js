@@ -259,7 +259,19 @@ const getAsset = assetTag => {
   });
 }
 
+const updateAsset = data => {
+  return new Promise((resolve, reject) => {
+    redBeam.then(session => {
+      session.put('https://webapi.assettracking.redbeam.com/api/Items/'+data.entityId, data)
+      .then(res => resolve(res.data))
+      .catch(err => reject(err));
+    })
+    .catch(err => reject(err));
+  });
+}
+
 module.exports = {
   getUser: getUser,
-  getAsset: getAsset
+  getAsset: getAsset,
+  update: updateAsset
 }
