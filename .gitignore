@@ -7,3 +7,6 @@ build/
 
 # Server configuration settings
 config.js
+
+# Misc
+.DS_Store
