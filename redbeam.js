@@ -259,6 +259,32 @@ const getAsset = assetTag => {
   });
 }
 
+const getManufacturer = man => {
+  return new Promise((resolve, reject) => {
+    redBeam.then(session => {
+      session.get('https://webapi.assettracking.redbeam.com/api/Manufacturers').then(res => {
+        //Search if manufacturer already exists in redBeam
+        const regex = new RegExp(man, 'gi');
+        for(let i = 0; i < res.data.length; i++){
+          if(res.data[i].description.match(regex)){
+            resolve(res.data[i].id);
+            break;
+          }
+        }
+
+        //Manufacturer isn't in redbeam, add them
+        session.post('https://webapi.assettracking.redbeam.com/api/Manufacturers', {
+          description: man,
+          itcEvent: '0',
+          itcId: '1'
+        }).then(res => {
+          resolve(res.data.id);
+        }).catch(err => reject(err));
+      }).catch(err => reject(err));
+    }).catch(err => reject(err));
+  });
+}
+
 const updateAsset = data => {
   return new Promise((resolve, reject) => {
     redBeam.then(session => {
@@ -273,5 +299,6 @@ const updateAsset = data => {
 module.exports = {
   getUser: getUser,
   getAsset: getAsset,
+  getManufacturer: getManufacturer,
   update: updateAsset
 }
