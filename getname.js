@@ -3,10 +3,20 @@ const exec = require('child_process').exec;
 
 module.exports = function(username){
   return new Promise((resolve, reject) => {
+    if(username.match(/doterrala/gi)){
+      //Return empty name if local admin
+      resolve(parseName());
+    }
     if(process.platform === 'win32'){
-      exec('net user %username% /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+      exec('net user '+username+' /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
         if(err){
-          reject(err);
+          //Check if error is due to user not found
+          if(err.message.match(/The user name could not be found/gi)){
+            //Return empty name
+            resolve(parseName());
+          }else{
+            reject(err);
+          }
         }
 
         if(stderr){
@@ -43,6 +53,11 @@ function parseName(name){
   }
 
   if(!name){
+    return output;
+  }
+
+  //Check if name is system admin
+  if(name.match(/admin/gi)){
     return output;
   }
 
