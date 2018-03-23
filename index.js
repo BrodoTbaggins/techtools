@@ -1,3 +1,7 @@
+const log = require('./logger');
+log.write('Starting app');
+
+log.write('Loading dependencies');
 const getMac = require('./getmac');
 const getName = require('./getName');
 const os = require('os');
@@ -5,6 +9,7 @@ const redBeam = require('./redbeam');
 const si = require('systeminformation');
 
 //Gather synchronous data
+log.write('Gathering synchronous data');
 const data = {
   hostname: os.hostname(),
   asset: os.hostname().match(/\d+/)[0],
@@ -12,6 +17,7 @@ const data = {
 }
 
 //Gather asynchronous data
+log.write('Starting promises');
 const promises = [
   getMac(),
   getName(data.username),
@@ -21,6 +27,7 @@ const promises = [
 ];
 
 Promise.all(promises).then(res => {
+  log.write('Promises finished');
   //getMac()
   data.network = res[0];
 
@@ -36,16 +43,22 @@ Promise.all(promises).then(res => {
   //si.osInfo()
   data.os = res[3].distro;
 
+  log.write('Finished writing data');
+  log.write(JSON.stringify(data, null, 2));
+
   //redBeam.getAsset()
   const redBeamData = res[4];
 
   //Query redbeam for manufacturer ID and name ID if a name was found in the system
+  log.write('Getting manufacturer ID');
   const promises = [redBeam.getManufacturer(data.manufacturer)];
   if(data.firstName && data.lastName){
+    log.write('Getting user ID');
     promises.push(redBeam.getUser(data.firstName, data.lastName));
   }
 
   Promise.all(promises).then(res => {
+    log.write('RedBeam promises finished');
 
     //Add manufacturer ID
     if(res[0]){
@@ -83,8 +96,16 @@ Promise.all(promises).then(res => {
       redBeamData.userField4 = data.os;
     }
 
+    log.write('Finished writing RedBeam data');
+    log.write(JSON.stringify(redBeamData, null, 2));
+
     //Send updated data to redbeam
-    redBeam.update(redBeamData).then(res => console.log('Done'));
+    log.write('Sending data to RedBeam');
+    redBeam.update(redBeamData).then(res => {
+      log.write('RedBeam update successful');
+      console.log('Done');
+      log.write('Exiting');
+    });
   }).catch(err => {
     console.error(err);
     process.exit(1);

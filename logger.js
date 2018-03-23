@@ -16,7 +16,6 @@ const file = fs.createWriteStream(logPath+logName);
 //Close stream when app exits
 process.on('exit', () => {
   file.end();
-  console.log(logPath + logName);
 });
 
 const write = txt => {
