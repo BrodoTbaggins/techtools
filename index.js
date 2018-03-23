@@ -15,6 +15,7 @@ const data = {
   asset: os.hostname().match(/\d+/)[0],
   username: os.userInfo().username
 }
+log.write(JSON.stringify(data, null, 2));
 
 //Gather asynchronous data
 log.write('Starting promises');
@@ -106,11 +107,5 @@ Promise.all(promises).then(res => {
       console.log('Done');
       log.write('Exiting');
     });
-  }).catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
-}).catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+  }).catch(log.error);
+}).catch(log.error);
