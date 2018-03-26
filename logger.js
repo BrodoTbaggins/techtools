@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const dialog = require('dialog');
 const fs = require('fs');
 const moment = require('moment');
@@ -44,6 +45,10 @@ const error = err => {
   }
 
   file.write('\n\n', () => {
+    console.log(chalk.red('A fatal error occured'));
+    console.log();
+    console.log(chalk.red('Log has been saved in'));
+    console.log(chalk.red(logPath+logName));
     dialog.err('A fatal error occured\n\nLog has been saved in\n'+logPath+logName, 'Tech Tools', () => {
       process.exit(1);
     });
