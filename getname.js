@@ -1,5 +1,6 @@
 const config = require('./config');
 const exec = require('child_process').exec;
+const log = require('./logger');
 
 module.exports = function(username){
   return new Promise((resolve, reject) => {
@@ -8,15 +9,12 @@ module.exports = function(username){
       resolve(parseName());
     }
     if(process.platform === 'win32'){
-      exec('net user '+username+' /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+      exec('net user "'+username+'" /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
         if(err){
-          //Check if error is due to user not found
-          if(err.message.match(/The user name could not be found/gi)){
-            //Return empty name
-            resolve(parseName());
-          }else{
-            reject(err);
-          }
+          log.write('Failed to find name');
+          
+          //Return empty name
+          resolve(parseName());
         }
 
         if(stderr){
