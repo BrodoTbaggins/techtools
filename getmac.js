@@ -1,8 +1,9 @@
 const exec = require('child_process').exec;
 const os = require('os');
 
-const wifiInterfaces = ['Wi-Fi', 'Wireless Network Connection'];
+const wifiInterfaces = ['Wi-Fi', 'Wireless'];
 const ethInterfaces = ['Ethernet', 'Local Area Connection'];
+const blacklistInterfaces = ['VirtualBox Host-Only Network', 'Bluetooth Network Connection'];
 
 module.exports = function(){
   return new Promise((resolve, reject) => {
@@ -34,17 +35,27 @@ module.exports = function(){
           }
 
           //Clean up interface name and mac
-          const nicName = currentMac[0].replace(/['"]+/g, '');
+          const interfaceName = currentMac[0].replace(/['"]+/g, '');
+          const nicName = currentMac[1].replace(/['"]+/g, '');
           const mac = currentMac[2].replace(/['"]+/g, '').replace(/\-+/g, ':');
 
-          //Check if we're looking for this interface
-          if(wifiInterfaces.indexOf(nicName) >= 0){
-            macs['Wi-Fi'] = mac;
-            continue;
-          }else if(ethInterfaces.indexOf(nicName) >= 0){
-            macs['Ethernet'] = mac;
+          //Check if interface is in black list
+          if(blacklistInterfaces.indexOf(interfaceName) > -1){
             continue;
           }
+
+          //Check if we're looking for this interface
+          wifiInterfaces.forEach(nic => {
+            if(nicName.indexOf(nic) > -1){
+              macs['Wi-Fi'] = mac;
+            }
+          });
+
+          ethInterfaces.forEach(nic => {
+            if(nicName.indexOf(nic) > -1){
+              macs['Ethernet'] = mac;
+            }
+          });
         }
 
         resolve(macs);
