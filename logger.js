@@ -5,7 +5,7 @@ const moment = require('moment');
 const os = require('os');
 
 const logPath = os.tmpdir()+'/Tech Tools/';
-const networkLogPath = require('./config').networkLogPath + os.hostname().match(/\d+/)[0] + '/';
+const networkLogPath = require('./config').networkLogPath + '/' + os.hostname().match(/\d+/)[0] + '/';
 const logName = moment().format('YYYY-MM-DD_HH-mm-ss')+'.log';
 
 //Check if log directory exists
