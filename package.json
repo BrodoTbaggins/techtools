@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "build": "node build"
+    "build": "node build",
+    "inventory": "electron main"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "systeminformation": "^3.37.5"
   },
   "devDependencies": {
-    "pkg": "^4.3.0"
+    "pkg": "^4.3.0",
+    "electron": "^2.0.0"
   }
 }
