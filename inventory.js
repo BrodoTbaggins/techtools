@@ -3,6 +3,13 @@ const config = require('./config');
 
 document.addEventListener('DOMContentLoaded', function(){
 
+  // Add listeners for buttons
+  document.getElementById('submit').addEventListener('click', formHandler);
+  document.getElementById('cancel').addEventListener('click', function(){
+    // Clear both inputs
+    [document.getElementById('asset'), document.getElementById('serial')].forEach(input => input.value = null);
+  });
+
   // Add event listeners for keyboard shortcuts
   document.addEventListener('keydown', function(e){
     if(e.which !== 9 && e.which !== 13){
@@ -11,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // Stop page from tabbing or submitting
     e.preventDefault();
-
-    const asset = document.getElementById('asset');
-    const serial = document.getElementById('serial');
 
     // Go back to previous element if shift is held
     if(e.shiftKey){
@@ -31,26 +35,33 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     }
 
-    // Select top most element with no value
-    if(!asset.value.trim()){
-      asset.focus();
-      return;
-    }
-
-    if(!serial.value.trim()){
-      serial.focus();
-      return;
-    }
-
-    console.log('a');
-
-    if(asset.value.trim() && serial.value.trim()){
-      submit(asset.value.trim(), serial.value.trim());
-    }
+    formHandler();
   });
 });
 
-function submit(asset, serial){
+function formHandler(){
+  const asset = document.getElementById('asset');
+  const serial = document.getElementById('serial');
+
+  // Select top most element with no value
+  if(!asset.value.trim()){
+    asset.focus();
+    return;
+  }
+
+  if(!serial.value.trim()){
+    serial.focus();
+    return;
+  }
+
+  console.log('a');
+
+  if(asset.value.trim() && serial.value.trim()){
+    send(asset.value.trim(), serial.value.trim());
+  }
+}
+
+function send(asset, serial){
   const data = {
     id: '00000000-0000-0000-0000-000000000000',
     entityId: '',
