@@ -61,6 +61,11 @@ function formHandler(){
 }
 
 function send(asset, serial){
+  // Reset form
+  document.getElementById('asset').value = '';
+  document.getElementById('serial').value = '';
+  document.getElementById('asset').focus();
+  
   const data = {
     id: '00000000-0000-0000-0000-000000000000',
     entityId: '',
