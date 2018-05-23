@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Add event listeners for keyboard shortcuts
   document.addEventListener('keydown', function(e){
+    if(e.which === 123){
+      require('electron').remote.getCurrentWindow().toggleDevTools();
+      return;
+    }
     if(e.which !== 9 && e.which !== 13){
       return;
     }
@@ -65,7 +69,7 @@ function send(asset, serial){
   document.getElementById('asset').value = '';
   document.getElementById('serial').value = '';
   document.getElementById('asset').focus();
-  
+
   const data = {
     id: '00000000-0000-0000-0000-000000000000',
     entityId: '',
