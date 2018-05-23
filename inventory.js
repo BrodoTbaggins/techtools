@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('./config');
+const allRequests = [];
 
 document.addEventListener('DOMContentLoaded', function(){
 
@@ -53,8 +54,6 @@ function formHandler(){
     serial.focus();
     return;
   }
-
-  console.log('a');
 
   if(asset.value.trim() && serial.value.trim()){
     send(asset.value.trim(), serial.value.trim());
@@ -199,8 +198,55 @@ function send(asset, serial){
   data.personId = '2269e681-0208-4427-ba0d-1fc039bbbd37'; // Unassigned
   data.locationId = '5cd08e0c-5e46-4f29-be3a-7056af3eae97' // IT Storage
 
-  axios.post('https://webapi.assettracking.redbeam.com/api/Items', data)
-  .then(console.log);
+  // Compile request in object for later reference
+  const requestObj = {
+    // Send POST request
+    request: axios.post('https://webapi.assettracking.redbeam.com/api/Items', data),
+    serial: serial.toString(),
+    asset: asset.toString()
+  }
+
+  allRequests.push(requestObj);
+
+  // Add request to log
+  // Create row for object
+  const row = document.createElement('tr');
+
+  // Create column for each item in object
+  const assetC = document.createElement('td');
+  assetC.appendChild(document.createTextNode(requestObj.asset));
+  row.appendChild(assetC);
+
+  const serialC = document.createElement('td');
+  serialC.appendChild(document.createTextNode(requestObj.serial));
+  row.appendChild(serialC);
+
+  const statusC = document.createElement('td');
+  statusC.appendChild(document.createTextNode('In Progress'));
+  row.appendChild(statusC);
+
+  // Add row to table
+  document.querySelector('tbody').appendChild(row);
+
+  const updateStatus = res => {
+    // Remove existing text nodes in status
+    while(statusC.firstChild){
+      statusC.firstChild.remove();
+    }
+
+    if(typeof res.response === 'object'){
+      res = res.response;
+    }
+
+    // Check if update was successful
+    if(res.status === 200 || res.status === 201){
+      statusC.appendChild(document.createTextNode('Done'));
+    }else{
+      statusC.appendChild(document.createTextNode(`Failed. Status: ${res.status}`));
+    }
+  }
+
+  requestObj.request.then(updateStatus).catch(updateStatus);
 }
 
 // Authenticate with redbeam

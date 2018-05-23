@@ -6,16 +6,23 @@
         background-color: #f5f5f5;
         color: #333;
         font-family: 'Raleway';
-        padding: 10px;
+        padding: 5px;
         user-select: none;
+        display: flex;
+        justify-content: space-between;
       }
-      form{
+      .section{
         padding: 10px;
         background-color: #fff;
-        width: 100%;
+        flex: 1;
         box-sizing: border-box;
         border:1px solid #eee;
         margin: 0;
+        height: 100%;
+        overflow: auto;
+      }
+      .section:not(:first-of-type){
+        margin-left: 10px;
       }
       label{
         display: block;
@@ -65,10 +72,22 @@
         color: #666;
         background-color: #bbb;
       }
+      table{
+        width: 100%;
+        table-layout: fixed;
+      }
+      tbody{
+        font-size: 14px;
+      }
+      td, th{
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     </style>
   </head>
   <body>
-    <form>
+    <div class="section">
       <label for="asset">Asset tag</label>
       <input id="asset" autofocus requied/>
       <label for="serial">Serial number</label>
@@ -77,7 +96,15 @@
         <div class="btn secondary" id="cancel">Cancel</div>
         <div class="btn" id="submit">Save</div>
       </div>
-    </form>
+    </div>
+    <div class="section">
+      <table>
+        <thead>
+          <tr><th>Asset</th><th>Serial</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </body>
   <script src="inventory.js"></script>
 </html>

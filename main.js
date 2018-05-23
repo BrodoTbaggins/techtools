@@ -11,8 +11,26 @@ const BrowserWindow = electron.BrowserWindow;
 let mainWindow;
 
 function createWindow(){
+  // Delete all cookies
+  const session = electron.session;
+  session.defaultSession.cookies.get({}, (error, cookies) => {
+    cookies.forEach(cookie => {
+      let url = '';
+      url += cookie.secure ? 'https://' : 'http://';
+      url += cookie.domain.charAt(0) === '.' ? 'www' : '';
+      url += cookie.domain;
+      url += cookie.path;
+
+      session.defaultSession.cookies.remove(url, cookie.name, err => {
+        if(err){
+          console.log(`Error removing cookie ${cookie.name}`, err);
+        }
+      });
+    });
+  });
+
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 300, height: 400});
+  mainWindow = new BrowserWindow({width: 700, height: 500});
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
