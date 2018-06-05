@@ -13,7 +13,7 @@ log.write('Gathering synchronous data');
 const data = {
   hostname: os.hostname(),
   asset: os.hostname().match(/\d+/)[0],
-  username: os.userInfo().username
+  username: process.argv[2] || os.userInfo().username
 }
 log.write(JSON.stringify(data, null, 2));
 
@@ -84,11 +84,13 @@ Promise.all(promises).then(res => {
     if(data.model){
       redBeamData.model = data.model;
     }
-    if(data.network['Wi-Fi']){
-      redBeamData.userField1 = data.network['Wi-Fi'];
-    }
-    if(data.network['Ethernet']){
-      redBeamData.userField2 = data.network['Ethernet'];
+    if(data.network){
+      if(data.network['Wi-Fi']){
+        redBeamData.userField1 = data.network['Wi-Fi'];
+      }
+      if(data.network['Ethernet']){
+        redBeamData.userField2 = data.network['Ethernet'];
+      }
     }
     if(data.hostname){
       redBeamData.userField3 = data.hostname;

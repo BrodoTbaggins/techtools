@@ -61,7 +61,11 @@ module.exports = function(){
         resolve(macs);
       });
     }else if(process.platform === 'darwin'){
-      resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
+      try{
+        resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
+      }catch(err){
+        resolve();
+      }
     }else{
       resolve();
     }

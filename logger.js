@@ -53,50 +53,54 @@ process.on('unhandledRejection', (err, p) => {
 });
 
 const write = txt => {
-  file.write(moment().format('HH:mm:ss.SSS'));
-  file.write('\n');
-  file.write(txt);
-  file.write('\n\n');
+  try{
+    file.write(moment().format('HH:mm:ss.SSS'));
+    file.write('\n');
+    file.write(txt);
+    file.write('\n\n');
 
-  if(networkFile){
-    networkFile.write(moment().format('HH:mm:ss.SSS'));
-    networkFile.write('\n');
-    networkFile.write(txt);
-    networkFile.write('\n\n');
-  }
+    if(networkFile){
+      networkFile.write(moment().format('HH:mm:ss.SSS'));
+      networkFile.write('\n');
+      networkFile.write(txt);
+      networkFile.write('\n\n');
+    }
+  }catch(err){ /* Most likely failed to due output permissions. We don't care anyway */ }
 }
 
 const error = err => {
-  file.write(moment().format('HH:mm:ss.SSS'));
-  file.write('\n');
+  try{
+    file.write(moment().format('HH:mm:ss.SSS'));
+    file.write('\n');
 
-  if(err.stack){
-    file.write(err.stack);
-  }else if(typeof err === 'object'){
-    file.write(JSON.stringify(err, null, 2));
-  }else if(typeof err === 'string'){
-    file.write(err);
-  }
-
-  if(networkFile){
     if(err.stack){
-      networkFile.write(err.stack);
+      file.write(err.stack);
     }else if(typeof err === 'object'){
-      networkFile.write(JSON.stringify(err, null, 2));
+      file.write(JSON.stringify(err, null, 2));
     }else if(typeof err === 'string'){
-      networkFile.write(err);
+      file.write(err);
     }
-  }
 
-  file.write('\n\n', () => {
-    console.log(chalk.red('A fatal error occured'));
-    console.log();
-    console.log(chalk.red('Log has been saved in'));
-    console.log(chalk.red(logPath+logName));
-    dialog.err('A fatal error occured\n\nLog has been saved in\n'+logPath+logName, 'Tech Tools', () => {
-      process.exit(1);
+    if(networkFile){
+      if(err.stack){
+        networkFile.write(err.stack);
+      }else if(typeof err === 'object'){
+        networkFile.write(JSON.stringify(err, null, 2));
+      }else if(typeof err === 'string'){
+        networkFile.write(err);
+      }
+    }
+
+    file.write('\n\n', () => {
+      console.log(chalk.red('A fatal error occured'));
+      console.log();
+      console.log(chalk.red('Log has been saved in'));
+      console.log(chalk.red(logPath+logName));
+      dialog.err('A fatal error occured\n\nLog has been saved in\n'+logPath+logName, 'Tech Tools', () => {
+        process.exit(1);
+      });
     });
-  });
+  }catch(err){ /* Most likely failed to due output permissions. We don't care anyway */ }
 }
 
 module.exports = {

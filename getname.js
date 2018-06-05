@@ -12,7 +12,7 @@ module.exports = function(username){
       exec('net user "'+username+'" /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
         if(err){
           log.write('Failed to find name');
-          
+
           //Return empty name
           resolve(parseName());
         }
@@ -27,13 +27,13 @@ module.exports = function(username){
         resolve(parseName(name));
       });
     }else if(process.platform === 'darwin'){
-      exec('dscl . -read "/Users/$(who am i | awk \'{print $1}\')" RealName | sed -n \'s/^ \/\/g;2p\'', (err, stdout, stderr) => {
+      exec('id -P $(stat -f%Su /dev/console) | cut -d : -f 8', (err, stdout, stderr) => {
         if(err){
-          reject(err);
+          resolve(parseName());
         }
 
         if(stderr){
-          reject(stderr);
+          resolve(parseName());
         }
 
         resolve(parseName(stdout));
