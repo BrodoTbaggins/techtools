@@ -65,11 +65,22 @@ module.exports = function(){
       }
 
       case 'darwin': {
-        try{
-          resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
-        }catch(err){
-          resolve();
-        }
+        const macs = {}
+        exec('networksetup -listallhardwareports', (err, stdout, stderr) => {
+          if(err || stderr){
+            resolve();
+          }
+
+          // Seperate each interface
+          const res = stdout.split('\n\n');
+          for(let i of res){
+            const match = i.match(/Hardware Port: (.+)\n?.*?\nEthernet Address: ([a-f0-9:]+)/i);
+            if(match){
+              macs[match[1]] = match[2];
+            }
+          }
+          resolve(macs);
+        });
         break;
       }
 
