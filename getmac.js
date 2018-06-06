@@ -7,67 +7,76 @@ const blacklistInterfaces = ['VirtualBox Host-Only Network', 'Bluetooth Network 
 
 module.exports = function(){
   return new Promise((resolve, reject) => {
-    if(process.platform === 'win32'){
-      const macs = {};
 
-      exec('getmac /fo csv /v', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
-        if(err){
-          reject(err);
-        }
-
-        if(stderr){
-          reject(stderr);
-        }
-
-        //Parse CSV into array
-        const allMacs = stdout.split('\n');
-
-        //Remove CSV header
-        allMacs.shift();
-
-        //Parse all macs
-        for(let i = 0; i < allMacs.length; i++){
-          const currentMac = allMacs[i].split(',');
-
-          //Continue if array is empty
-          if(!currentMac[0].trim() || !currentMac[2].trim()){
-            continue;
+    switch(process.platform){
+      case 'win32': {
+        exec('getmac /fo csv /v', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+          const macs = {}
+          if(err){
+            reject(err);
           }
 
-          //Clean up interface name and mac
-          const interfaceName = currentMac[0].replace(/['"]+/g, '');
-          const nicName = currentMac[1].replace(/['"]+/g, '');
-          const mac = currentMac[2].replace(/['"]+/g, '').replace(/\-+/g, ':');
-
-          //Check if interface is in black list
-          if(blacklistInterfaces.indexOf(interfaceName) > -1){
-            continue;
+          if(stderr){
+            reject(stderr);
           }
 
-          //Check if we're looking for this interface
-          wifiInterfaces.forEach(nic => {
-            if(nicName.indexOf(nic) > -1){
-              macs['Wi-Fi'] = mac;
-            }
-          });
+          //Parse CSV into array
+          const allMacs = stdout.split('\n');
 
-          ethInterfaces.forEach(nic => {
-            if(nicName.indexOf(nic) > -1){
-              macs['Ethernet'] = mac;
-            }
-          });
-        }
+          //Remove CSV header
+          allMacs.shift();
 
-        resolve(macs);
-      });
-    }else if(process.platform === 'darwin'){
-      try{
-        resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
-      }catch(err){
-        resolve();
+          //Parse all macs
+          for(let i = 0; i < allMacs.length; i++){
+            const currentMac = allMacs[i].split(',');
+
+            //Continue if array is empty
+            if(!currentMac[0].trim() || !currentMac[2].trim()){
+              continue;
+            }
+
+            //Clean up interface name and mac
+            const interfaceName = currentMac[0].replace(/['"]+/g, '');
+            const nicName = currentMac[1].replace(/['"]+/g, '');
+            const mac = currentMac[2].replace(/['"]+/g, '').replace(/\-+/g, ':');
+
+            //Check if interface is in black list
+            if(blacklistInterfaces.indexOf(interfaceName) > -1){
+              continue;
+            }
+
+            //Check if we're looking for this interface
+            wifiInterfaces.forEach(nic => {
+              if(nicName.indexOf(nic) > -1){
+                macs['Wi-Fi'] = mac;
+              }
+            });
+
+            ethInterfaces.forEach(nic => {
+              if(nicName.indexOf(nic) > -1){
+                macs['Ethernet'] = mac;
+              }
+            });
+          }
+
+          resolve(macs);
+        });
+        break;
       }
-    }else{
-      resolve();
+
+      case 'darwin': {
+        try{
+          resolve({'Wi-Fi': os.networkInterfaces().en0[0].mac});
+        }catch(err){
+          resolve();
+        }
+        break;
+      }
+
+      default: {
+        resolve();
+        break;
+      }
     }
   });
 }

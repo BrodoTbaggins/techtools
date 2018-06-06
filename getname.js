@@ -8,39 +8,50 @@ module.exports = function(username){
       //Return empty name if local admin
       resolve(parseName());
     }
-    if(process.platform === 'win32'){
-      exec('net user "'+username+'" /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
-        if(err){
-          log.write('Failed to find name');
 
-          //Return empty name
-          resolve(parseName());
-        }
+    switch(process.platform){
+      case 'win32': {
+        exec('net user "'+username+'" /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+          if(err){
+            log.write('Failed to find name');
 
-        if(stderr){
-          reject(stderr);
-        }
+            //Return empty name
+            resolve(parseName());
+          }
 
-        //Remove other characters from out
-        const name = stdout.split(/\s{2,}/g)[1];
+          if(stderr){
+            reject(stderr);
+          }
 
-        resolve(parseName(name));
-      });
-    }else if(process.platform === 'darwin'){
-      exec('id -P $(stat -f%Su /dev/console) | cut -d : -f 8', (err, stdout, stderr) => {
-        if(err){
-          resolve(parseName());
-        }
+          //Remove other characters from out
+          const name = stdout.split(/\s{2,}/g)[1];
 
-        if(stderr){
-          resolve(parseName());
-        }
+          resolve(parseName(name));
+        });
+        break;
+      }
 
-        resolve(parseName(stdout));
-      });
-    }else{
-      resolve(parseName());
+      case 'darwin': {
+        exec('id -P $(stat -f%Su /dev/console) | cut -d : -f 8', (err, stdout, stderr) => {
+          if(err){
+            resolve(parseName());
+          }
+
+          if(stderr){
+            resolve(parseName());
+          }
+
+          resolve(parseName(stdout));
+        });
+        break;
+      }
+
+      default: {
+        resolve(parseName());
+        break;
+      }
     }
+  
   });
 }
 
