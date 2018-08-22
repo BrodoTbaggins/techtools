@@ -1,6 +1,6 @@
-const config = require('./config');
 const exec = require('child_process').exec;
 const log = require('./logger');
+const Shell = require('node-powershell');
 
 module.exports = function(username){
   return new Promise((resolve, reject) => {
@@ -11,23 +11,52 @@ module.exports = function(username){
 
     switch(process.platform){
       case 'win32': {
-        exec('net user "'+username+'" /domain | find /i "full name"', {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
-          if(err){
-            log.write('Failed to find name');
-
-            //Return empty name
-            resolve(parseName());
-          }
-
-          if(stderr){
-            reject(stderr);
-          }
-
-          //Remove other characters from out
-          const name = stdout.split(/\s{2,}/g)[1];
-
-          resolve(parseName(name));
+        const ps = new Shell({
+          executionPolicy: 'Bypass',
+          noProfile: true
         });
+
+        ps.addCommand('(Get-WmiObject -Class win32_process -ComputerName . | Where-Object name -Match explorer).getowner().user')
+        ps.invoke()
+          .then(output => {
+            // Remove whitespace from output
+            if(output){
+              output = output.trim();
+
+              // Return only the first name
+              output = output.split('\n')[0];
+            }
+            
+            log.write('Successfully queried WMI. Found ' + output);
+
+            // Search for first, last name
+            const command = 'net user "'+output+'" /domain | find /i "full name"';
+            log.write('Executing: '+command);
+            exec(command, {cwd: 'C:\\Windows'}, (err, stdout, stderr) => {
+              if(err){
+                log.write('Failed to find name');
+    
+                //Return empty name
+                resolve(parseName());
+                ps.dispose();
+              }
+    
+              if(stderr){
+                reject(stderr);
+                ps.dispose();
+              }
+    
+              //Remove other characters from out
+              const name = stdout.split(/\s{2,}/g)[1];
+    
+              resolve(parseName(name));
+              ps.dispose();
+            });
+          })
+          .catch(err => {
+            log.write('Failed to query WMI for name');
+            resolve(parseName());
+          });
         break;
       }
 

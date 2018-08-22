@@ -1,3 +1,10 @@
+// Check if we're running in audit mode
+process.argv.forEach(val => {
+  if(/--audit/i.test(val)){
+    process.auditMode = true;
+  }
+});
+
 const log = require('./logger');
 log.write('Starting app');
 
@@ -7,6 +14,7 @@ const getName = require('./getName');
 const os = require('os');
 const redBeam = require('./redbeam');
 const si = require('systeminformation');
+const fs = require('fs');
 
 //Gather synchronous data
 log.write('Gathering synchronous data');
@@ -106,6 +114,19 @@ Promise.all(promises).then(res => {
     log.write('Sending data to RedBeam');
     redBeam.update(redBeamData).then(res => {
       log.write('RedBeam update successful');
+
+      // Write check file if in audit mode
+      if(process.auditMode){
+        log.write('Writing audit file');
+        const path = 'C:/Program Files/Tech Tools/';
+        if(!fs.existsSync(path)){
+          fs.mkdirSync(path);
+        }
+
+        fs.writeFileSync(path + 'DeploymentCheck.dat', new Date());
+        log.write('Finished writing audit file');
+      }
+
       console.log('Done');
       log.write('Exiting');
     });

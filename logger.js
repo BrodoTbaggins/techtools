@@ -4,7 +4,13 @@ const fs = require('fs');
 const moment = require('moment');
 const os = require('os');
 
-const logPath = os.tmpdir()+'/Tech Tools/';
+let logPath = os.tmpdir()+'/Tech Tools/';
+if(process.auditMode){
+  logPath = 'C:/Temp/Tech Tools/';
+  if(!fs.existsSync('C:/Temp')){
+    fs.mkdirSync('C:/Temp');
+  }
+}
 const networkLogPath = require('./config').networkLogPath + '/' + os.hostname().match(/\d+/)[0] + '/';
 const logName = moment().format('YYYY-MM-DD_HH-mm-ss')+'.log';
 
