@@ -29,6 +29,8 @@ module.exports = function(username){
             
             log.write('Successfully queried WMI. Found ' + output);
 
+            process.username = output;
+
             // Search for first, last name
             const command = 'net user "'+output+'" /domain | find /i "full name"';
             log.write('Executing: '+command);

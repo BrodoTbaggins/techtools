@@ -5,7 +5,7 @@ const moment = require('moment');
 const os = require('os');
 
 let logPath = os.tmpdir()+'/Tech Tools/';
-if(process.auditMode){
+if(process.auditFile && process.platform === 'win32'){
   logPath = 'C:/Temp/Tech Tools/';
   if(!fs.existsSync('C:/Temp')){
     fs.mkdirSync('C:/Temp');

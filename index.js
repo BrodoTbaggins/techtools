@@ -1,27 +1,25 @@
 // Check if we're running in audit mode
-process.argv.forEach(val => {
-  if(/--audit/i.test(val)){
-    process.auditMode = true;
-  }
-});
+const auditIndex = process.argv.indexOf('--audit');
+process.auditFile = auditIndex === -1 ? false : process.argv[auditIndex + 1];
 
 const log = require('./logger');
 log.write('Starting app');
 
 log.write('Loading dependencies');
+const auditFile = require('./auditFile');
 const getMac = require('./getmac');
 const getName = require('./getName');
 const os = require('os');
 const redBeam = require('./redbeam');
 const si = require('systeminformation');
-const fs = require('fs');
+const writeCSV = require('./writeCSV');
 
 //Gather synchronous data
 log.write('Gathering synchronous data');
 const data = {
   hostname: os.hostname(),
   asset: os.hostname().match(/\d+/)[0],
-  username: process.argv[2] || os.userInfo().username
+  username: process.argv.indexOf('--username') > -1 ? process.argv[process.argv.indexOf('--username') + 1] : os.userInfo().username
 }
 log.write(JSON.stringify(data, null, 2));
 
@@ -43,6 +41,7 @@ Promise.all(promises).then(res => {
   //getName()
   data.firstName = res[1].first;
   data.lastName = res[1].last;
+  data.username = process.username;
 
   //si.system()
   data.model = res[2].model;
@@ -110,22 +109,29 @@ Promise.all(promises).then(res => {
     log.write('Finished writing RedBeam data');
     log.write(JSON.stringify(redBeamData, null, 2));
 
+    // Check if we want to update a CSV instead
+    const fileIndex = process.argv.indexOf('--csv');
+    const csvLocation = fileIndex > -1 ? process.argv[fileIndex + 1] : false;
+
+    if(csvLocation){
+      writeCSV(csvLocation, data)
+        .then(() => {
+          auditFile();
+          console.log('Done');
+          log.write('Exiting');
+        })
+        .catch(log.error);
+
+      return;
+    }
+
     //Send updated data to redbeam
     log.write('Sending data to RedBeam');
     redBeam.update(redBeamData).then(res => {
       log.write('RedBeam update successful');
 
-      // Write check file if in audit mode
-      if(process.auditMode){
-        log.write('Writing audit file');
-        const path = 'C:/Program Files/Tech Tools/';
-        if(!fs.existsSync(path)){
-          fs.mkdirSync(path);
-        }
-
-        fs.writeFileSync(path + 'DeploymentCheck.dat', new Date());
-        log.write('Finished writing audit file');
-      }
+      // Write audit file
+      auditFile();
 
       console.log('Done');
       log.write('Exiting');
