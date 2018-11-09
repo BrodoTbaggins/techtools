@@ -7,12 +7,16 @@ log.write('Starting app');
 
 log.write('Loading dependencies');
 const auditFile = require('./auditFile');
+const autorun = require('./autorun');
 const getMac = require('./getmac');
 const getName = require('./getName');
 const os = require('os');
 const redBeam = require('./redbeam');
 const si = require('systeminformation');
 const writeCSV = require('./writeCSV');
+
+// check if we're running in automatic mode
+process.auto = process.argv.indexOf('--auto') > -1;
 
 //Gather synchronous data
 log.write('Gathering synchronous data');
@@ -122,6 +126,11 @@ Promise.all(promises).then(res => {
         })
         .catch(log.error);
 
+      return;
+    }
+
+    if(process.auto){
+      autorun(data, redBeamData);
       return;
     }
 
