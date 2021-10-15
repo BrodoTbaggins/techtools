@@ -7,15 +7,12 @@ log.write('Starting app');
 
 log.write('Loading dependencies');
 const auditFile = require('./auditFile');
-const autorun = require('./autorun');
 const getMac = require('./getmac');
 const getName = require('./getName');
 const os = require('os');
 const redBeam = require('./redbeam');
 const si = require('systeminformation');
-const writeCSV = require('./writeCSV');
-const { red } = require('chalk');
-const { redbeam } = require('./config');
+
 
 // check if we're running in automatic mode
 process.auto = process.argv.indexOf('--auto') > -1;
@@ -81,17 +78,10 @@ Promise.all(promises).then(res => {
 
     log.write("Finished adding IDs to data")
 
-    console.log(data)
-
   //Update Redbeam
   log.write('Sending data to RedBeam')
   redBeam.update(data)
 
   }).catch(log.error)
- 
-
-
-  
-
 
 }).catch(log.error)

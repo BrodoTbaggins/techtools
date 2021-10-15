@@ -160,8 +160,6 @@ const createAsset = data => {
     
   }
 
-  console.log(redBeamData)
-
   return new Promise((resolve, reject) =>{
     redBeam.then(token => {
       axios.post('https://app.redbeam.com/api/item/item', redBeamData, {
@@ -170,7 +168,6 @@ const createAsset = data => {
         }})
     .then(res => {
       
-        console.log(res.status)
       
       resolve(res)
     })
@@ -198,9 +195,6 @@ const createManufacturer = man => {
           'Authorization': token
         }})
     .then(res => {
-  
-      console.log(`Manufacturer ${man} has been created`)
-      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
       
       resolve(res.data._id)
     })
@@ -228,9 +222,6 @@ const createModel = model => {
           'Authorization': token
         }})
     .then(res => {
-  
-      console.log(`Model ${model} has been created`)
-      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
       
       resolve(res.data._id)
     })
@@ -257,9 +248,6 @@ const createUser = (firstName, lastName) => {
           'Authorization': token
         }})
     .then(res => {
-  
-      console.log(`User ${firstName} ${lastName} has been created`)
-      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
       
       resolve(res.data._id)
     })
@@ -326,9 +314,6 @@ const updateAsset = (assetID, data) => {
         ]
       })
     .then(res => {
-      if(res){
-        console.log(res.status)
-      }
       
       resolve(res)
     })
@@ -347,13 +332,13 @@ const update = (data) => {
  
   getAssetID(data.asset).then(assetID => {
 
+    //Checck if the Asset exists
     if(assetID){
-      console.log("Updating existing asset")
+    //Update Existing Asset
       updateAsset(assetID, data)
       return
     } else {
-    
-      console.log("Creating new asset")
+    //Create a new Asset
       createAsset(data)
       return
       }
