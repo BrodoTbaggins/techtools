@@ -57,7 +57,7 @@ const createAsset = (data) => {
     "active": true,
     "cost": "0.00",
     "customFieldOne": `${data.network['Wi-Fi']}`,
-    "customFieldTwo": "Wired Mac",
+    "customFieldTwo": `${data.network.Ethernet}`,
     "customFieldThree": `${data.hostname}`,
     "customFieldFour": `${data.os}`,
     "location:building": {
@@ -81,6 +81,10 @@ const createAsset = (data) => {
     "organization:person": {
       "_id": "6123a75422479c8f9beb4de6",
       "title": `${data.firstName} ${data.lastName}`
+    },
+    "item:model": {
+      "_id": "6123a75d22479c8f9beb64b8",
+      "title": `${data.model}`
     }
   }
 
@@ -131,7 +135,7 @@ const updateAsset = (assetID, data) => {
         {
           "op": "replace",
           "path": "/customFieldTwo",
-          "value": `Wired Mac`
+          "value": `${data.network.Ethernet}`
         },
         {
           "op": "replace",
@@ -153,6 +157,11 @@ const updateAsset = (assetID, data) => {
           "path": "/serialNo",
           "value": `${data.serialNumber}`
         },
+        {
+          "op": "replace",
+          "path": "/model",
+          "value": `${data.model}`
+        }
         ]
       })
     .then(res => {
