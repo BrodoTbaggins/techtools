@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index",
     "build": "node build",
-    "inventory": "electron main"
+    "inventory": "electron main",
+    "austin": "node austin"
   },
   "repository": {
     "type": "git",
@@ -18,15 +19,15 @@
   },
   "homepage": "https://github.com/treemmett/techtools#readme",
   "dependencies": {
-    "axios": "^0.18.0",
-    "chalk": "^2.3.2",
+    "axios": "^0.22.0",
+    "chalk": "^4.1.2",
     "dialog": "^0.3.1",
-    "moment": "^2.21.0",
-    "node-powershell": "^3.3.1",
-    "systeminformation": "^3.37.5"
+    "moment": "^2.29.1",
+    "node-powershell": "^4.0.0",
+    "systeminformation": "^5.9.7"
   },
   "devDependencies": {
-    "electron": "^2.0.0",
-    "pkg": "^4.3.0"
+    "electron": "^15.1.2",
+    "pkg": "^5.3.3"
   }
 }
