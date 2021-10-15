@@ -47,18 +47,76 @@ const getAssetID = assetTag => {
   })
 }
 
-//Function to get asset manufacturer id or create new manufacturer id if needed
-const getManufacturer = man =>{
-
+//Function to get asset manufacturer id or call the createManufacturer function if needed 
+const getManufacturerID = man =>{
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.get(`https://app.redbeam.com/api/organization/manufacturer?offset=0&limit=1&page=1&pageSize=25&orderBy=title%3Aa&searchTerm=${man}&searchProperties=title`, {
+      headers: {
+        'Authorization': token
+      }
+    },)
+    .then(res => {
+      //If response is null the manufacturer does not exist
+      if(res.data){
+        resolve(res.data.items[0]._id)
+      } else {
+        createManufacturer(man).then(id => resolve(id))
+      }
+      
+    })
+    .catch(err => {reject(err);}
+    );
+    })
+  })
 }
-//Function to get asset model id or create new model id if needed
-const getModel = model =>{
 
+//Function to get asset model id or call the createModel function if needed 
+const getModelID = model =>{
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.get(`https://app.redbeam.com/api/item/model?offset=0&limit=1&page=1&pageSize=25&orderBy=title%3Aa&searchTerm=${model}&searchProperties=title`, {
+      headers: {
+        'Authorization': token
+      }
+    },)
+    .then(res => {
+      //If response is null the model does not exist
+      if(res.data){
+        resolve(res.data.items[0]._id)
+      } else {
+        createModel(model).then(id => resolve(id))
+      }
+      
+    })
+    .catch(err => {reject(err);}
+    );
+    })
+  })
 }
 
-//Function to get person id from redbeam or create new person if needed
-const getUser = user =>{
-
+//Function to get person id from redbeam or call the createUser function if needed 
+const getUserID = (firstName, lastName) =>{
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.get(`https://app.redbeam.com/api/organization/person?offset=0&limit=1&page=1&pageSize=25&orderBy=title%3Aa&searchTerm=${firstName}%20${lastName}&searchProperties=title`, {
+      headers: {
+        'Authorization': token
+      }
+    },)
+    .then(res => {
+      //If response is null the user does not exist
+      if(res.data){
+        resolve(res.data.items[0]._id)
+      } else {
+        createUser(firstName, lastName).then(id => resolve(id))
+      }
+      
+    })
+    .catch(err => {reject(err);}
+    );
+    })
+  })
 }
 
 //Function to add new Asset in Redbeam
@@ -109,9 +167,8 @@ const createAsset = data => {
           'Authorization': token
         }})
     .then(res => {
-      if(res){
+      
         console.log(res.status)
-      }
       
       resolve(res)
     })
@@ -125,6 +182,94 @@ const createAsset = data => {
   })
 }
 
+//Function to createManufacturer
+const createManufacturer = man => {
+
+  let redBeamData = {
+    "title": man
+  }
+
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.post('https://app.redbeam.com/api/organization/manufacturer', redBeamData, {
+        headers: {
+          'Authorization': token
+        }})
+    .then(res => {
+  
+      console.log(`Manufacturer ${man} has been created`)
+      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
+      
+      resolve(res.data._id)
+    })
+    .catch(err => {
+
+      reject(err)
+    
+    }
+    );
+    })
+  })
+}
+
+
+//Function to createModel
+const createModel = model => {
+  let redBeamData = {
+    "title": model
+  }
+
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.post('https://app.redbeam.com/api/item/model', redBeamData, {
+        headers: {
+          'Authorization': token
+        }})
+    .then(res => {
+  
+      console.log(`Model ${model} has been created`)
+      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
+      
+      resolve(res.data._id)
+    })
+    .catch(err => {
+
+      reject(err)
+    
+    }
+    );
+    })
+  })
+}
+
+//Function to createUser
+const createUser = (firstName, lastName) => {
+  let redBeamData = {
+    "title": `${firstName} ${lastName}`
+  }
+
+  return new Promise((resolve, reject) =>{
+    redBeam.then(token => {
+      axios.post('https://app.redbeam.com/api/organization/person', redBeamData, {
+        headers: {
+          'Authorization': token
+        }})
+    .then(res => {
+  
+      console.log(`User ${firstName} ${lastName} has been created`)
+      console.log(`With a status code of ${res.status} and id of ${res.data._id}`)
+      
+      resolve(res.data._id)
+    })
+    .catch(err => {
+
+      reject(err)
+    
+    }
+    );
+    })
+  })
+}
 
 //Function to Update an existing Asset in Redbeam
 const updateAsset = (assetID, data) => {
@@ -230,8 +375,8 @@ let assetDataTest = {
   },
   firstName: 'Darth',
   lastName: 'Vader',
-  model: 'MacBookPro15,1',
-  manufacturer: 'Apple Inc.',
+  model: 'BIGBOI9000',
+  manufacturer: 'PLZDELETE',
   serialNumber: 'C02X31WAJG5L',
   os: 'macOS'
 }
@@ -258,10 +403,17 @@ let assetDataTest2 = {
   os: 'BIGSURBOI'
 }
 
+//Random Tests are listed below.  Will be deleted for final product
+
 //update(assetDataTest2);
 
 //updateAsset('6123a75e22479c8f9beb673c', assetDataTest)
 
+//getManufacturerID(assetDataTest.manufacturer).then(id => console.log(`Manufacturer ID:${id}`))
+
+//getModelID(assetDataTest.model).then(id => console.log(`Model ID:${id}`))
+
+//getUserID(assetDataTest.firstName, assetDataTest.lastName).then(id => console.log(`User ID:${id}`))
 
 module.exports = {
   update: update
