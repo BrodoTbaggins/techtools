@@ -23,8 +23,6 @@ const redBeam = new Promise((resolve, reject) => {
     });
   });
 
-//Function to get Asset information for the redbeam fields
-
 //Function to get Asset ID
 const getAssetID = assetTag => {
   return new Promise((resolve, reject) =>{
@@ -362,66 +360,6 @@ const update = (data) => {
 
 })
 }
-
-
-let assetDataTest = {
-  hostname: 'UTMPG06891',
-  asset: '06891',
-  username: undefined,
-  network: {
-    'Thunderbolt Ethernet Slot 1': '64:4b:f0:10:9c:7e',
-    'Wi-Fi': 'f0:18:98:1c:c5:3b',
-    'Bluetooth PAN': 'f0:18:98:19:ea:b8',
-    'Thunderbolt 1': '82:92:15:e3:a4:01',
-    'Thunderbolt 2': '82:92:15:e3:a4:00',
-    'Thunderbolt 3': '82:92:15:e3:a4:05',
-    'Thunderbolt 4': '82:92:15:e3:a4:04',
-    'Thunderbolt Bridge': '82:92:15:e3:a4:01'
-  },
-  firstName: 'Darth',
-  lastName: 'Vader',
-  model: 'BIGBOI9000',
-  manufacturer: 'PLZDELETE',
-  serialNumber: 'C02X31WAJG5L',
-  os: 'macOS'
-}
-
-
-let assetDataTest2 = {
-  hostname: 'STRONGBOI06891',
-  asset: '06891',
-  username: undefined,
-  network: {
-    'Thunderbolt Ethernet Slot 1': '64:4b:f0:10:9c:7e',
-    'Wi-Fi': 'aa:aa:aa:aa:aa:aa',
-    'Bluetooth PAN': 'f0:18:98:19:ea:b8',
-    'Thunderbolt 1': '82:92:15:e3:a4:01',
-    'Thunderbolt 2': '82:92:15:e3:a4:00',
-    'Thunderbolt 3': '82:92:15:e3:a4:05',
-    'Thunderbolt 4': '82:92:15:e3:a4:04',
-    'Thunderbolt Bridge': '82:92:15:e3:a4:01'
-  },
-  firstName: 'Darth',
-  lastName: 'Vader',
-  model: 'MacBookPro15,1',
-  manufacturer: 'Apples',
-  serialNumber: 'AAAAAAAA',
-  os: 'BIGSURBOI'
-}
-
-
-
-//Random Tests are listed below.  Will be deleted for final product
-
-//update(assetDataTest);
-
-//updateAsset('6123a75e22479c8f9beb673c', assetDataTest)
-
-//getManufacturerID(assetDataTest.manufacturer).then(id => console.log(`Manufacturer ID:${id}`))
-
-//getModelID(assetDataTest.model).then(id => console.log(`Model ID:${id}`))
-
-//getUserID(assetDataTest.firstName, assetDataTest.lastName).then(id => console.log(`User ID:${id}`))
 
 module.exports = {
   update: update,

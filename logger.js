@@ -11,7 +11,7 @@ if(process.auditFile && process.platform === 'win32'){
     fs.mkdirSync('C:/Temp');
   }
 }
-//const networkLogPath = require('./config').networkLogPath + '/' + os.hostname().match(/\d+/)[0] + '/';
+
 const logName = moment().format('YYYY-MM-DD_HH-mm-ss')+'.log';
 
 //Check if log directory exists
@@ -22,38 +22,6 @@ if(!fs.existsSync(logPath)){
 //Open file stream
 const file = fs.createWriteStream(logPath+logName);
 
-//Attempt connection to network log
-/*var networkFile = null;
-try{
-  //Create log location if it doesn't exist
-  if(!fs.existsSync(networkLogPath)){
-    fs.mkdirSync(networkLogPath);
-  }
-
-  //networkFile = fs.createWriteStream(networkLogPath+logName);
-}catch(err){
-  file.on('open', () => {
-    file.write(moment().format('HH:mm:ss.SSS'));
-    file.write('\n');
-    file.write('Failed to open connection to network log location');
-    file.write('\n');
-    //file.write(networkLogPath+logName);
-    file.write('\n');
-    file.write(err.stack);
-    file.write('\n');
-  });
-}
-
-
-//Close stream when app exits
-process.on('exit', () => {
-  file.end();
-
-  if(networkFile){
-    networkFile.end();
-  }
-});
-*/
 
 //Handle all uncaught rejections
 process.on('unhandledRejection', (err, p) => {
