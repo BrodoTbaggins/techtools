@@ -31,11 +31,12 @@ log.write(JSON.stringify(data, null, 2));
 
 //Gather asynchronous data
 log.write('Starting promises');
-const promises = [
+let promises = [
   getMac(),
   getName(data.username),
   si.system(),
-  si.osInfo(),
+  si.osInfo()
+
 ];
 
 Promise.all(promises).then(res => {
@@ -59,12 +60,38 @@ Promise.all(promises).then(res => {
   log.write('Finished writing data');
   log.write(JSON.stringify(data, null, 2));
 
-  console.log(data)
+  log.write('Starting redbeam promises')
+  promises = [
+    redBeam.getManufacturerID(data.manufacturer),
+    redBeam.getModelID(data.model),
+    redBeam.getUserID(data.firstName, data.lastName)
+  ]
+
+  Promise.all(promises).then(res => {
+    log.write("Redbeam promises finished")
+
+    //getManufacturerID()
+    data.manufacturerID = res[0]
+
+    //getModelID()
+    data.modelID = res[1]
+
+    //getUserID()
+    data.userID = res[2]
+
+    log.write("Finished adding IDs to data")
+
+    console.log(data)
 
   //Update Redbeam
   log.write('Sending data to RedBeam')
   redBeam.update(data)
 
+  }).catch(log.error)
+ 
+
+
+  
 
 
 }).catch(log.error)

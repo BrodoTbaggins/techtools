@@ -23,7 +23,9 @@ const redBeam = new Promise((resolve, reject) => {
     });
   });
 
-//Function to get Asset info and return the id number
+//Function to get Asset information for the redbeam fields
+
+//Function to get Asset ID
 const getAssetID = assetTag => {
   return new Promise((resolve, reject) =>{
     redBeam.then(token => {
@@ -145,20 +147,22 @@ const createAsset = data => {
     },
     "organization:manufacturer": {
       "title": data.manufacturer,
-      "_id": "ID COMING SOON"
+      "_id": data.manufacturerID
     },
     "serialNo": data.serialNumber,
     "description": "",
     "organization:person": {
       "title": `${data.firstName} ${data.lastName}`,
-      "_id": "ID COMING SOON"
+      "_id": data.userID
     },
     "item:model": {
       "title": data.model,
-      "_id": "ID COMING SOON"
+      "_id": data.modelID
     }
     
   }
+
+  console.log(redBeamData)
 
   return new Promise((resolve, reject) =>{
     redBeam.then(token => {
@@ -342,14 +346,15 @@ const updateAsset = (assetID, data) => {
 
 //Update function that ties the other functions together
 const update = (data) => {
+ 
+  getAssetID(data.asset).then(assetID => {
 
-  getAssetID(data.asset).then(id => {
-    
-    if(id){
+    if(assetID){
       console.log("Updating existing asset")
-      updateAsset(id, data)
+      updateAsset(assetID, data)
       return
     } else {
+    
       console.log("Creating new asset")
       createAsset(data)
       return
@@ -381,6 +386,7 @@ let assetDataTest = {
   os: 'macOS'
 }
 
+
 let assetDataTest2 = {
   hostname: 'STRONGBOI06891',
   asset: '06891',
@@ -403,9 +409,11 @@ let assetDataTest2 = {
   os: 'BIGSURBOI'
 }
 
+
+
 //Random Tests are listed below.  Will be deleted for final product
 
-//update(assetDataTest2);
+//update(assetDataTest);
 
 //updateAsset('6123a75e22479c8f9beb673c', assetDataTest)
 
@@ -416,5 +424,8 @@ let assetDataTest2 = {
 //getUserID(assetDataTest.firstName, assetDataTest.lastName).then(id => console.log(`User ID:${id}`))
 
 module.exports = {
-  update: update
+  update: update,
+  getManufacturerID: getManufacturerID,
+  getModelID: getModelID,
+  getUserID: getUserID
 }
