@@ -1,5 +1,4 @@
 const axios = require('axios');
-const { redbeam } = require('./config');
 const config = require('./config');
 
 //Authenticate with Redbeam and get a JWT
@@ -48,18 +47,32 @@ const getAssetID = assetTag => {
   })
 }
 
+//Function to get asset manufacturer id or create new manufacturer id if needed
+const getManufacturer = man =>{
+
+}
+//Function to get asset model id or create new model id if needed
+const getModel = model =>{
+
+}
+
+//Function to get person id from redbeam or create new person if needed
+const getUser = user =>{
+
+}
+
 //Function to add new Asset in Redbeam
-const createAsset = (data) => {
+const createAsset = data => {
 
   //Prepare data for redbeam
   let redBeamData = {
-    "assetNo": `${data.asset}`,
+    "assetNo": data.asset,
     "active": true,
     "cost": "0.00",
     "customFieldOne": `${data.network['Wi-Fi']}`,
-    "customFieldTwo": `${data.network.Ethernet}`,
-    "customFieldThree": `${data.hostname}`,
-    "customFieldFour": `${data.os}`,
+    "customFieldTwo": data.network.Ethernet ? data.network.Ethernet : "",
+    "customFieldThree": data.hostname,
+    "customFieldFour": data.os,
     "location:building": {
       "title": "A3",
       "_id": "6123a75522479c8f9beb513d"
@@ -73,19 +86,20 @@ const createAsset = (data) => {
       "_id": "6123a75522479c8f9beb529c"
     },
     "organization:manufacturer": {
-      "title": `${data.manufacturer}`,
-      "_id": "6123a75422479c8f9beb4e99"
+      "title": data.manufacturer,
+      "_id": "ID COMING SOON"
     },
-    "serialNo": `${data.serialNumber}`,
+    "serialNo": data.serialNumber,
     "description": "",
     "organization:person": {
-      "_id": "6123a75422479c8f9beb4de6",
-      "title": `${data.firstName} ${data.lastName}`
+      "title": `${data.firstName} ${data.lastName}`,
+      "_id": "ID COMING SOON"
     },
     "item:model": {
-      "_id": "6123a75d22479c8f9beb64b8",
-      "title": `${data.model}`
+      "title": data.model,
+      "_id": "ID COMING SOON"
     }
+    
   }
 
   return new Promise((resolve, reject) =>{
@@ -130,37 +144,37 @@ const updateAsset = (assetID, data) => {
         {
           "op": "replace",
           "path": "/customFieldOne",
-          "value": `${data.network['Wi-Fi']}`
+          "value": data.network['Wi-Fi']
         },
         {
           "op": "replace",
           "path": "/customFieldTwo",
-          "value": `${data.network.Ethernet}`
+          "value": data.network.Ethernet
         },
         {
           "op": "replace",
           "path": "/customFieldThree",
-          "value": `${data.hostname}`
+          "value": data.hostname
         },
         {
           "op": "replace",
           "path": "/customFieldFour",
-          "value": `${data.os}`
+          "value": data.os
         },
         {
           "op": "replace",
           "path": "/organization:manufacturer.title",
-          "value": `${data.manufacturer}`
+          "value": data.manufacturer
         },
         {
           "op": "replace",
           "path": "/serialNo",
-          "value": `${data.serialNumber}`
+          "value": data.serialNumber
         },
         {
           "op": "replace",
-          "path": "/model",
-          "value": `${data.model}`
+          "path": "/item:model.title",
+          "value": data.model
         }
         ]
       })
